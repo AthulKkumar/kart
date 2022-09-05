@@ -8,6 +8,7 @@ const Handlebars = require('handlebars');
 const{ allowInsecurePrototypeAccess } = require('@handlebars/allow-prototype-access');
 const { handlebars } = require('hbs');
 const fileUpload = require('express-fileupload');
+const session = require('express-session');
 const db = require('./config/connection');
 
 var app = express();
@@ -26,7 +27,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(fileUpload()); //uses when any files are uploading through this site
-
+app.use(session({secret:'key', resave: false,saveUninitialized: true,cookie:{maxAge:600000}}))
 // database connection 
 db.connect((err)=>{
   if(err) console.log('connection failed'+err);

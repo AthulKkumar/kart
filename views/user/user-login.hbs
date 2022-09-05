@@ -1,0 +1,26 @@
+<section>
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-6">
+                {{#if loginErr}}
+                <div class="alert alert-danger" role="alert">
+                    Invalid crendintials
+                </div>
+                {{/if}}
+                <h2>Log In</h2>
+                <form action="/login" method="post">
+                    <label for="">Email</label>
+                    <input type="email" name="email" class="form-control">
+
+                    <label for="">Password</label>
+                    <input type="password" name="password" class="form-control">
+                  
+                    <a href="/signup" class="">New account</a>
+
+                    <button type="submit" class="btn btn-primary mt-4 ">Submit</button>
+                  
+                </form>
+            </div>
+        </div>
+    </div>
+</section>

@@ -10,14 +10,13 @@ router.get('/', function(req, res, next) {
     res.render('admin/view-products', {admin:true ,products});
   })
 });
+
 // product adding page for admin
 router.get('/add-product',(req,res)=>{
   res.render('admin/add-product')
 })
-
+//products are added from admin side
 router.post('/add-product',(req,res)=>{
-  // console.log(req.body)
-  // console.log(req.files);
   productHelpers.addProduct(req.body,(id)=>{
     console.log(id);
     let image = req.files.Image;
@@ -28,6 +27,13 @@ router.post('/add-product',(req,res)=>{
         console.log(err);
       }
     })
+  })
+})
+
+router.get('/delete-product/:id',(req,res)=>{
+  let prodId = req.params.id;
+  productHelpers.deleteProduct(prodId).then((response)=>{
+    res.redirect('/admin')
   })
 })
 
