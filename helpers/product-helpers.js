@@ -6,10 +6,7 @@ const objectId = require('mongodb').ObjectId;
 module.exports = {
     //adding product fuction
     addProduct :  (product,callback)=>{
-        // console.log(product);
         db.get().collection('product').insertOne(product).then(()=>{
-
-            // console.log(product._id);
             callback(product._id)
         });
     
@@ -21,14 +18,36 @@ module.exports = {
             resolve(products);
         })
     },
-
+    //Deleting the product
     deleteProduct : (prodId)=>{
         return new Promise((resolve,reject)=>{
             db.get().collection(collection.PRODUCT_COLLECTION).deleteOne({_id:objectId(prodId)}).then((response)=>{
-                console.log(response);
                 resolve(response)
             })
         })
+    },
+    //Function for acquring the details of an product
+    getProductDetails : (proId)=>{
+        return new Promise((resolve,reject)=>{
+            db.get().collection(collection.PRODUCT_COLLECTION).findOne({_id:objectId(proId)}).then((product)=>{
+                resolve(product)
+            })
+        })
+    },
+    //Function for update the product
+    updateProduct : (proId,proDetails)=>{
+        return new Promise((resolve,reject)=>{
+            db.get().collection(collection.PRODUCT_COLLECTION)
+            .updateOne({_id:objectId(proId)},{
+                $set :{
+                    name : proDetails.name,
+                    category : proDetails.category,
+                    price : proDetails.price,
+                    description : proDetails.description
+                }
+            }).then((response)=>{
+                resolve()
+            })
+        })
     }
-
 }
