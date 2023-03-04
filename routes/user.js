@@ -6,7 +6,7 @@ const userHelpers = require('../helpers/user-helpers');
 
 //Middleware
 //To check the user loged in or not
-let verifyLogin = (req,res,next)=>{
+let verifyLogin = (req, res, next)=>{
   if(req.session.loggedIn){
     next()
   }else{
@@ -24,11 +24,11 @@ router.get('/', async function(req, res, next) {
     cartCount = await userHelpers.getCartCount(req.session.user._id)
   }  
   productHelpers.getAllProducts().then((products)=>{
-    res.render('user/view-product', {products,user,cartCount});
+    res.render('user/view-product', {products, user, cartCount});
   })  
 });
 //user login page
-router.get('/login',(req,res)=>{
+router.get('/login', (req, res)=>{
   if(req.session.loggedIn){
     res.redirect('/')
   }else{
@@ -37,14 +37,15 @@ router.get('/login',(req,res)=>{
   }
 });
 //user signup page
-router.get('/signup',(req,res)=>{
+router.get('/signup', (req, res)=>{
   res.render('user/user-signup');
 })
 
-router.post('/signup',(req,res)=>{
+router.post('/signup', (req, res)=>{
   userHelpers.doSignup(req.body).then((response)=>{
     req.session.loggedIn = true;
     req.session.user = response.user;
+    res.redirect('/')
 
   })
 })
@@ -72,18 +73,39 @@ router.get('/logout',(req,res)=>{
 //If the user clicks in the cart option
 router.get('/cart',verifyLogin,async(req,res)=>{
   let products = await userHelpers.getCartProducts(req.session.user._id)
-  console.log(products);
-  res.render('user/user-cart',{products,user:req.session.user})
+  let totalPrice = await userHelpers.getTotalAmount(req.session.user._id)
+  // console.log(products);
+  res.render('user/user-cart',{products,user:req.session.user,totalPrice})
 })
 
 //If the user clicks in the Add to cart button
-router.get('/add-to-cart/:id',verifyLogin,(req,res)=>{
+router.get('/add-to-cart/:id',verifyLogin,(req, res)=>{
   //Sending the productId and user Id as an parameter 
-  console.log('api call');
-  userHelpers.addToCart(req.params.id,req.session.user._id).then((response)=>{  
-    res.json({status:true})
+  userHelpers.addToCart(req.params.id, req.session.user._id).then((response)=>{  
+    res.json({status:true})//Sending an respone to the user (ajax)
   })
 
 })
+//To change the product quantity in the users cart
+router.post('/change-product-quantity',(req, res)=>{
 
+  userHelpers.changeProductQuantity(req.body).then(async(response)=>{
+    response.total = await userHelpers.getTotalAmount(req.session.user._id)
+    res.json(response)
+  })
+})
+//Will display the place the order page to fill details
+router.get('/place-order', verifyLogin, async(req, res)=>{
+  let total = await userHelpers.getTotalAmount(req.session.user._id)//Get the total amount of the products
+  res.render('user/place-order',{total, user: req.session.user})
+})
+//To place the order
+router.post('/place-order', async(req, res)=>{
+  let products = await userHelpers.getCartProductList(req.body.userId)//Get the products only 
+  let totalPrice = await userHelpers.getTotalAmount(req.body.userId)
+  userHelpers.placeOrder(req.body,products,totalPrice).then(()=>{
+
+  })
+  console.log(req.body);
+})
 module.exports = router;

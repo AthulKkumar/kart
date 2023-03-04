@@ -46,6 +46,7 @@ module.exports = {
                     description : proDetails.description
                 }
             }).then((response)=>{
+                
                 resolve()
             })
         })
